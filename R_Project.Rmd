@@ -1,0 +1,156 @@
+---
+title: "R Project"
+output: html_document
+date: "2023-12-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import Data
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(readr)
+library(ggplot2)
+library(dplyr)
+train_data <- read_csv('train.csv')
+
+
+```
+
+```{r}
+# Convert to Data frame: 
+
+dfT <-  as.data.frame(train_data)
+
+
+dfT[8:12]
+```
+
+
+```{r}
+ggplot(data = train_data)+
+  geom_bar(mapping = aes(x = Destination, fill = Transported)
+  )
+
+  
+```
+
+```{r}
+DB %>%
+  na.omit(subset = !is.na(CryoSleep)) %>% 
+ ggplot(mapping = aes(x = CryoSleep, y = TotalSpent, fill = HomePlanet))+
+  geom_boxplot(outlier.shape = NA)+
+  coord_cartesian(xlim = NULL, ylim = c(0,17000))
+  
+
+```
+
+```         
+```
+
+```{r}
+DB <- mutate(train_data,
+      GroupId = sapply(strsplit(as.character(PassengerId),"_"),function(x) x[1]),
+      TotalSpent = RoomService + FoodCourt + ShoppingMall + Spa + VRDeck)
+
+
+```
+
+```{r}
+DB %>%
+  na.omit(subset = !is.na(HomePlanet)) %>% 
+  filter(TotalSpent >=0, CryoSleep != TRUE) %>%
+  ggplot(mapping = aes(x = Age, y = TotalSpent, color = HomePlanet)) +
+    geom_point(alpha = 1/5)
+
+
+
+
+  
+```
+
+```{r}
+
+DB %>%
+  na.omit(subset = !is.na(HomePlanet)) %>% 
+  group_by(HomePlanet, CryoSleep,) %>%
+  summarize(
+    count = n(),
+    avgAge = round(mean(Age,na.rm = TRUE), digits = 2),
+    avgSpending = round(mean(TotalSpent, na.rm = TRUE,), digits = 2)
+  ) %>%
+  filter(CryoSleep != TRUE) %>%
+  ggplot()+
+  geom_col(mapping = aes(x = HomePlanet,y=avgSpending, fill = HomePlanet))+
+  labs(title = "Average Spending by Home Planet", y = "")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+```{r}
+
+DB %>%
+  ggplot()+
+  geom_boxplot(mapping = aes(y = Age,x=Destination))+
+  labs(title = "Destination by Age")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+DB %>% 
+  group_by(HomePlanet) %>%
+  summarize(
+    TotalRoomService = sum(RoomService,na.rm = TRUE),
+    TotalFoodCourt = sum(FoodCourt,na.rm = TRUE),
+    TotalShoppingMall = sum(ShoppingMall,na.rm = TRUE),
+    TotalSpa =sum(Spa,na.rm = TRUE),
+    TotalVRDeck = sum(VRDeck,na.rm = TRUE)
+  )
+
+  
+
+```
+
+```{r}
+options(scipen=999)
+#install.packages("scales")
+ Europa <-  data.frame(
+  category = c('Room Service','Food Court', 'Shopping Mall', 'Spa', 'VR Deck'),
+  value = c(304261,3134199,314054,1769044,1833854)
+ ) %>%
+  arrange(desc(category)) %>%
+  mutate(prop = value / sum(value) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+ 
+
+  
+ ggplot(data = Europa, aes(x="", y =prop, fill = category))+
+   geom_bar(stat = 'identity', width = 1, color = 'white') +
+   coord_polar('y',start =0)+
+   theme_void()+
+   geom_text(aes( y = ypos, label = scales::percent(value / sum(value))), size = 2.2 )+
+   labs(title = "Europa Citizens Amenity Spending")+
+   theme(plot.title = element_text(hjust = 0.5))
+)
+
+```
+
+```{r}
+DB %>%
+  group_by(CryoSleep) %>%
+  summarize(
+    count = n(),
+    avgAge = round(mean(Age,na.rm = TRUE), digits = 2),
+    avgSpending = round(mean(TotalSpent, na.rm = TRUE,), digits = 2)
+  )
+```
+
+```{r}
+
+
+```
